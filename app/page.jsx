@@ -1,8 +1,12 @@
 'use client';
 import { useState } from 'react';
+import { PasswordDisplay } from '@/components/PasswordDisplay';
+import { PasswordControls } from '@/components/PasswordControls';
+import { GenerateButton } from '@/components/GenerateButton';
+import { Footer } from '@/components/Footer';
 
 export default function PasswordGenerator() {
-  const [length, setLength] = useState(12);
+  const [length, setLength] = useState(16);
   const [includeNumbers, setIncludeNumbers] = useState(true);
   const [includeSymbols, setIncludeSymbols] = useState(true);
   const [password, setPassword] = useState('');
@@ -20,35 +24,39 @@ export default function PasswordGenerator() {
     setPassword(generatedPassword);
   };
 
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(password);
+    alert('Password copied to clipboard!');
+  };
+
   return (
-    <div className="max-w-md mx-auto mt-10 p-5 bg-gray-800 text-white rounded-xl shadow-lg">
-      <h2 className="text-2xl font-bold mb-4">Password Generator</h2>
-      <div className="mb-3">
-        <label className="block mb-1">Length: {length}</label>
-        <input 
-          type="range" 
-          min="6" max="24" 
-          value={length} 
-          onChange={(e) => setLength(e.target.value)}
-          className="w-full"
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center p-4 relative">
+      <div className="w-full max-w-md bg-white/10 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/20">
+        <h2 className="text-4xl font-extrabold text-center mb-8 bg-gradient-to-r from-emerald-400 to-cyan-400 text-transparent bg-clip-text">
+          🔐 SecurePass
+        </h2>
+        
+        <PasswordControls
+          length={length}
+          includeNumbers={includeNumbers}
+          includeSymbols={includeSymbols}
+          onLengthChange={setLength}
+          onNumbersChange={() => setIncludeNumbers(!includeNumbers)}
+          onSymbolsChange={() => setIncludeSymbols(!includeSymbols)}
         />
-      </div>
-      <div className="mb-3 flex items-center">
-        <input type="checkbox" id="numbers" checked={includeNumbers} onChange={() => setIncludeNumbers(!includeNumbers)} />
-        <label htmlFor="numbers" className="ml-2">Include Numbers</label>
-      </div>
-      <div className="mb-3 flex items-center">
-        <input type="checkbox" id="symbols" checked={includeSymbols} onChange={() => setIncludeSymbols(!includeSymbols)} />
-        <label htmlFor="symbols" className="ml-2">Include Symbols</label>
-      </div>
-      <button onClick={generatePassword} className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
-        Generate Password
-      </button>
-      {password && (
-        <div className="mt-4 p-2 bg-gray-700 rounded text-center select-all">
-          {password}
+
+        <div className="mt-6">
+          <GenerateButton onClick={generatePassword} />
         </div>
-      )}
+
+        {password && (
+          <PasswordDisplay 
+            password={password} 
+            onCopy={copyToClipboard} 
+          />
+        )}
+      </div>
+      <Footer />
     </div>
   );
 }
